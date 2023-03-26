@@ -9,27 +9,88 @@ export class FormWelcome extends HTMLElement {
     this.connctedCallback();
   }
   connctedCallback() {
+    state.subscribe(() => {
+      const currenstate = state.getState();
+
+      currenstate.name;
+      currenstate.email;
+      currenstate.userId;
+
+      this.render();
+    });
     const form = this.querySelector(".form");
     // console.log(form, "este es el form");
 
     form.addEventListener("submit", (e) => {
+      e.preventDefault();
       const target = e.target as any;
-      // console.log(target.nombre.value, "nombre");
-      state.setName(target.nombre.value);
+      const name = target.name.value;
+      const email = target.email.value;
+      //   console.log(name, email);
+      state.setName(name);
+      state.setEmail(email);
+
+      const valorDeSala = target.sala.value;
+      //   console.log(valorDeSala);
+
+      const id = state.data.userId;
+
+      state.singIn()?.then(() => {
+        state.askNewRoom();
+        console.log(state.data.rtdbRoomId, "esta es la page del RTDBROOM");
+      });
+      if (valorDeSala == id) {
+        console.log(state.data.userId, "esto es el valor del state");
+
+        console.log("iguales");
+        //
+      } else {
+        console.log("distintos");
+
+        //  console.log(target.userId.value);
+      }
+      //      console.log(target.sala.value, "esto es el valor de sala");
+
       Router.go("/chat");
       this.render();
     });
+
     const selectRoom: any = form?.querySelector(".selectroom");
     const existingRoom: any = form?.querySelector(".select-sala");
-    // console.log(existingRoom, "es para seleccionar");
-
     // console.log(selectRoom);
-    selectRoom.addEventListener("change", function () {
+    selectRoom.addEventListener("change", function (e) {
+      const target = e.target as any;
+
       if (selectRoom.value == "existingroom") {
         existingRoom.style.display = "inline";
-        // console.log("si crea una sala nueva", existingRoom);
       } else {
         existingRoom.style.display = "none";
+      }
+    });
+  }
+  comparador() {
+    const form = this.querySelector(".form");
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const target = e.target as any;
+
+      const valorDeSala = target.sala.value;
+      //   console.log(valorDeSala);
+
+      const id = state.data.userId;
+
+      if (valorDeSala == id) {
+        state.singIn()?.then(() => {
+          state.askNewRoom();
+        });
+        // console.log(state.data.userId, "esto es el valor del state");
+
+        console.log("iguales");
+        //
+      } else {
+        console.log("distintos");
+
+        //  console.log(target.userId.value);
       }
     });
   }
@@ -48,6 +109,8 @@ export class FormWelcome extends HTMLElement {
     
     <div><label class ="form-label" >  Tu Email</label></div>
     <input  class ="form-input" type ="email" name= "email" placeholder= "Tu Email">
+    
+    
     <div><label class ="form-label">  Salas </label>   </div>
     <select class ="selectroom form-input" name ="selectroom" id :"selectroom">
     <option class ="newroom" value = "newroom">Nueva Sala</option>
@@ -56,7 +119,7 @@ export class FormWelcome extends HTMLElement {
 <div class ="select-sala">
 
 <div> <label class ="form-label" >  Nombre de la sala</label>    </div>
-<input  class ="form-input " type ="text" name= "nombre" placeholder= " Nombre de la sala">
+<input  class ="form-input " type ="text" name= "sala" placeholder= " Nombre de la sala">
 </div>
     
     <button class ="form-button" >Comenzar</button>
@@ -142,7 +205,6 @@ export class FormWelcome extends HTMLElement {
 
     div.appendChild(style);
     this.append(div);
-    return div;
   }
 }
 customElements.define("form-welcome", FormWelcome);

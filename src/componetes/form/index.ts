@@ -1,4 +1,5 @@
 import { state } from "../../state";
+import { map } from "lodash";
 
 type Message = {
   name: string;
@@ -8,14 +9,17 @@ type Message = {
 export class Header extends HTMLElement {
   constructor() {
     super();
-    this.render();
     this.conncTedCallback();
+    this.render();
   }
 
   conncTedCallback() {
     state.subscribe(() => {
       const currenstate = state.getState();
+      const userIds = currenstate.userId;
+
       const messageFromState = currenstate.messages;
+
       this.messages = messageFromState;
       this.render();
     });
@@ -28,16 +32,19 @@ export class Header extends HTMLElement {
       e.preventDefault();
       const target = e.target as any;
       state.pushManager(target["new-message"].value);
+      form.reset();
       // console.log(target["new-message"].value);
       this.render();
     });
   }
   render() {
     const div = document.createElement("div");
+    //console.log("Eeste mensasge", this.messages);
 
     div.className = "container";
     div.innerHTML = `
     <div class = "messages">
+  <h1> Esta es la sala ${state.data.roomId}</hi
     <div>
     ${this.messages
       .map((m) => {
